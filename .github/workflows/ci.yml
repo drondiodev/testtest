@@ -1,0 +1,33 @@
+name: Continuous Integration workflow
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint code
+        run: pnpm run lint
+
+      - name: Build Docker image
+        run: docker build -t nextjs14cicd:latest .
+
+      - name: Run Docker container
+        run: docker run -d -p 3000:3000 nextjs14cicd:latest
